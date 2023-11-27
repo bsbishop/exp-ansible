@@ -1,0 +1,31 @@
+---
+- name: Copy certs to each host
+  hosts: myhosts
+  remote_user: ec2-user
+  vars:
+    pki_base_path: /etc/pki
+    certs_path: "{{ pki_base_path }}/mongodb"
+
+  tasks:
+
+  - name: Make directory for MongoDB Certificates
+    file:
+      path: "{{ certs_path }}"
+      state: directory
+      owner: "ec2-user"
+      group: "ec2-user"
+    become: true
+  - name: Copy CA cert
+    copy:
+      src: "./ca.pem"
+      dest: "{{ certs_path }}/ca.pem"
+      owner: "ec2-user"
+      group: "ec2-user"
+    become: true
+  - name: Copy host cert
+    copy:
+      src: "./{{ ansible_host }}.pem"
+      dest: "{{ certs_path }}/mongodb.pem"
+      owner: "ec2-user"
+      group: "ec2-user"
+    become: true
